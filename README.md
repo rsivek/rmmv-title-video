@@ -1,5 +1,4 @@
-# Demo Video
-https://youtu.be/I00OojC8pt0
+[Demo Video](https://youtu.be/I00OojC8pt0)
 
 # Description
 
@@ -55,3 +54,13 @@ var parameters = PluginManager.parameters('TitleVideo2');
 
 Basically this method allows you to add each video as a separate plugin and 
 modify the parameters for each video separately as you see fit.
+
+# Terms Of Use
+
+- Credit to the author Ryan Sivek is appreciated but not required
+- Plugin is free to use, modify and distribute according to the terms of the license
+- Do not claim as your own work
+
+# License
+
+[MIT](https://opensource.org/licenses/MIT)
