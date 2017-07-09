@@ -55,7 +55,7 @@ SOFTWARE.
  *          
  * @param Loop
  * @desc Whether to loop the video (yes/no)
- * @default true
+ * @default yes
  *          
  * @param Playback Rate
  * @desc Playback rate for the video. (Default: 1.0)
