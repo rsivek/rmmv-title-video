@@ -41,7 +41,7 @@ var parameters = PluginManager.parameters('TitleVideo');
 ```
 To
 ```js
-var parameters = PluginManager.parameters(NEW_FILENAME);
+var parameters = PluginManager.parameters('NEW_FILENAME');
 ```
 Replacing "NEW_FILENAME" with the filename of the copied js file without 
 the ".js" extension.
