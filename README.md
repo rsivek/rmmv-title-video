@@ -2,9 +2,9 @@
 
 # Description
 
-This is a JavaScript plugin for RPG Maker MV that allows the addition
-of a video to the title screen above the background image. Blending
-options can be tweaked to get several various effects.
+This is a simple JavaScript plugin for RPG Maker MV that allows the 
+addition of a video to the title screen above the background image. 
+Parameters can be tweaked to get several various effects.
 
 # Usage
 Place the video files for your target platforms into the project's
@@ -58,9 +58,14 @@ modify the parameters for each video separately as you see fit.
 # Terms Of Use
 
 - Credit to the author Ryan Sivek is appreciated but not required
-- Plugin is free to use, modify and distribute according to the terms of the license
+- Plugin is free to use, modify and distribute for any use including commercial use according to the terms of the license
 - Do not claim as your own work
 
 # License
 
 [MIT](https://opensource.org/licenses/MIT)
+
+
+
+
+
