@@ -115,8 +115,6 @@ SOFTWARE.
     var opacity = parameters.Opacity;
     var tint = parameters.Tint;
 
-    console.log('Params', parameters);
-
     var ST_createBackground = Scene_Title.prototype.createBackground;
 
     Scene_Title.prototype.createBackground = function() {
