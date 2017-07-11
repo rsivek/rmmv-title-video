@@ -1,5 +1,5 @@
 //=============================================================================
-// TitleVideo.js v1.0.0
+// TitleVideo.js v1.0.1
 // https://github.com/nanowizard/rmmv-title-video
 //=============================================================================
 
@@ -116,14 +116,18 @@ SOFTWARE.
     var tint = parameters.Tint;
 
     var ST_createBackground = Scene_Title.prototype.createBackground;
+    var ST_terminate = Scene_Title.prototype.terminate;
+    
+    var vidSprite;
 
     Scene_Title.prototype.createBackground = function() {
         ST_createBackground.call(this);
 
         var ext = Game_Interpreter.prototype.videoFileExt();
         var vidTexture = PIXI.Texture.fromVideo('movies/'+ filepath + ext);
-        var vidSprite = new PIXI.Sprite(vidTexture);
         var vid = vidTexture.baseTexture.source;
+        
+        vidSprite = new PIXI.Sprite(vidTexture);
 
         vidSprite.blendMode = PIXI.BLEND_MODES[blendMode.toUpperCase()] || PIXI.BLEND_MODES.NORMAL;
 
@@ -152,6 +156,12 @@ SOFTWARE.
         }
 
         this.addChild(vidSprite);
+    };
+
+    Scene_Title.prototype.terminate = function() {
+        ST_terminate.call(this);
+        
+        vidSprite.destroy(true);
     };
 
 })();
