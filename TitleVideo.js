@@ -73,6 +73,18 @@ SOFTWARE.
  * @desc Tint for the video sprite as a hex value. (Default: 0xffffff)
  * @default 0xffffff
  *          
+ * @param Loop Start
+ * @desc Video time (in seconds) to start the loop. (Default: 0)
+ * @default 0
+ *          
+ * @param Loop End
+ * @desc Video time (in seconds) to stop the video loop. ("end" or a number)
+ * @default end
+ *          
+ * @param Debug
+ * @desc Set this to "yes" to print debug statements to the console (F8 during gameplay)
+ * @default no
+ *          
  * @help
  * 
  * Place the video files for your target platforms into the project's
@@ -114,29 +126,41 @@ SOFTWARE.
     var blendMode = parameters['Blend Mode'];
     var opacity = parameters.Opacity;
     var tint = parameters.Tint;
+    var loopStart = parameters['Loop Start'];
+    var loopEnd = parameters['Loop End'];
+    var DEBUG = parameters.Debug === 'yes' ? true : false;
 
     var ST_createBackground = Scene_Title.prototype.createBackground;
     var ST_terminate = Scene_Title.prototype.terminate;
-    
+
     var vidSprite;
 
     Scene_Title.prototype.createBackground = function() {
         ST_createBackground.call(this);
 
+        if(DEBUG) console.log('TitleVideo parameters:', parameters);
+
         var ext = Game_Interpreter.prototype.videoFileExt();
-        var vidTexture = PIXI.Texture.fromVideo('movies/'+ filepath + ext);
+        var vidFilePath = 'movies/'+ filepath + ext;
+
+        if(DEBUG) console.log('Loading video as texture:', vidFilePath);
+        var vidTexture = PIXI.Texture.fromVideo(vidFilePath);
         var vid = vidTexture.baseTexture.source;
-        
+
         vidSprite = new PIXI.Sprite(vidTexture);
 
         vidSprite.blendMode = PIXI.BLEND_MODES[blendMode.toUpperCase()] || PIXI.BLEND_MODES.NORMAL;
 
         vid.addEventListener('loadedmetadata', function() {
+            if(DEBUG) console.log('Successfully loaded video metadata:');
             if(w === 'video') {
                 vidSprite.width = vid.videoWidth;
             }
             if(h === 'video') {
                 vidSprite.height = vid.videoHeight;
+            }
+            if(loopEnd === 'end') {
+                loopEnd = vid.duration;
             }
         });
 
@@ -155,12 +179,45 @@ SOFTWARE.
             vidTexture.update();
         }
 
+        if(loop){
+            loopStart = parseFloat(loopStart);
+            if(loopEnd !== 'end'){
+                loopEnd = parseFloat(loopEnd);
+            }
+            if(loopStart > 0 || loopEnd !== vid.duration) {
+                vid.loop = false;
+                vid.addEventListener('timeupdate', doCustomLoop);
+
+                if(DEBUG) console.log('Setting up custom loop from %s to %s:', loopStart.toFixed(3), loopEnd);
+
+                function doCustomLoop() {
+                    if(DEBUG) console.log('Time update:', vid.currentTime);
+                    if(vid.currentTime >= loopEnd){
+                        if(DEBUG) console.log('Looping back to ', loopStart);
+                        vid.currentTime = loopStart;
+                        vid.play();
+                    }
+                }
+            }
+        }
+        else {
+            vid.addEventListener('ended', function() {
+                vidSprite.visible = false;
+            });
+        }
+
+        if(DEBUG){
+            vid.addEventListener('error', function() {
+                console.error('video element error:', vid.error);
+            });
+        }
+
         this.addChild(vidSprite);
     };
 
     Scene_Title.prototype.terminate = function() {
         ST_terminate.call(this);
-        
+
         vidSprite.destroy(true);
     };
 
