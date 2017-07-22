@@ -1,5 +1,5 @@
 //=============================================================================
-// TitleVideo.js v1.1.0
+// TitleVideo.js v1.0.1
 // https://github.com/nanowizard/rmmv-title-video
 //=============================================================================
 
@@ -74,11 +74,11 @@ SOFTWARE.
  * @default 0xffffff
  *          
  * @param Loop Start
- * @desc Video time (in seconds) to start the loop. (Default: 0)
+ * @desc Time to start the video loop. (Default: 0)
  * @default 0
  *          
  * @param Loop End
- * @desc Video time (in seconds) to stop the video loop. ("end" or a number)
+ * @desc Time to stop the video loop. ("end" or a number)
  * @default end
  *          
  * @param Debug
@@ -132,8 +132,10 @@ SOFTWARE.
 
     var ST_createBackground = Scene_Title.prototype.createBackground;
     var ST_terminate = Scene_Title.prototype.terminate;
+    
+    var listeners = {};
 
-    var vidSprite;
+    var vidSprite, vid;
 
     Scene_Title.prototype.createBackground = function() {
         ST_createBackground.call(this);
@@ -145,8 +147,8 @@ SOFTWARE.
 
         if(DEBUG) console.log('Loading video as texture:', vidFilePath);
         var vidTexture = PIXI.Texture.fromVideo(vidFilePath);
-        var vid = vidTexture.baseTexture.source;
 
+        vid = vidTexture.baseTexture.source;
         vidSprite = new PIXI.Sprite(vidTexture);
 
         vidSprite.blendMode = PIXI.BLEND_MODES[blendMode.toUpperCase()] || PIXI.BLEND_MODES.NORMAL;
@@ -164,6 +166,8 @@ SOFTWARE.
             }
         });
 
+        window.vid = vid;
+
         vidSprite.width = w === 'auto' ? Graphics.width : (parseInt(w) || Graphics.width);
         vidSprite.height = h === 'auto' ? Graphics.height : (parseInt(h) || Graphics.height);
         vidSprite.x = parseInt(x) || 0;
@@ -177,7 +181,7 @@ SOFTWARE.
 
         vidSprite.update = function() {
             vidTexture.update();
-        }
+        };
 
         if(loop){
             loopStart = parseFloat(loopStart);
@@ -186,18 +190,9 @@ SOFTWARE.
             }
             if(loopStart > 0 || loopEnd !== vid.duration) {
                 vid.loop = false;
-                vid.addEventListener('timeupdate', doCustomLoop);
+                addListener('timeupdate', doCustomLoop);
 
                 if(DEBUG) console.log('Setting up custom loop from %s to %s:', loopStart.toFixed(3), loopEnd);
-
-                function doCustomLoop() {
-                    if(DEBUG) console.log('Time update:', vid.currentTime);
-                    if(vid.currentTime >= loopEnd){
-                        if(DEBUG) console.log('Looping back to ', loopStart);
-                        vid.currentTime = loopStart;
-                        vid.play();
-                    }
-                }
             }
         }
         else {
@@ -217,8 +212,38 @@ SOFTWARE.
 
     Scene_Title.prototype.terminate = function() {
         ST_terminate.call(this);
-
         vidSprite.destroy(true);
+        
+        removeListeners();
+        vid.pause();
+        vid.remove();
+        vid = null;
     };
+
+    function doCustomLoop() {
+        if(DEBUG) console.log('Time update:', vid.currentTime);
+        if(vid.currentTime >= loopEnd){
+            if(DEBUG) console.log('Looping back to ', loopStart);
+            vid.currentTime = loopStart;
+            vid.play();
+        }
+    }
+    
+    function addListener(evt, fn){
+        vid.addEventListener(evt, fn);
+        
+        if(!listeners[evt]){
+            listeners[evt] = [];
+        }
+        listeners[evt].push(fn);
+    }
+    
+    function removeListeners() {
+        Object.keys(listeners).forEach(function(evt){
+            listeners[evt].forEach(function(fn){
+                vid.removeEventListener(evt, fn);
+            });
+        });
+    }
 
 })();
